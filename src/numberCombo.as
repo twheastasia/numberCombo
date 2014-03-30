@@ -18,6 +18,7 @@ package
 		
 		private var currentScoresBoard:MovieClip;
 		private var bestScoresBoard:MovieClip;
+		private var gameOverBoard:MovieClip;
 		private var options:MovieClip;
 		private var cellBg:MovieClip;
 		private var cellsArray:Array = [];
@@ -26,6 +27,9 @@ package
 		private var mainSwf:MovieClip;
 		private var positions:Array = [];
 		private var currentCellsPos:Array = [];		
+		private var currentScores:int = 0;
+		private var bestScores:int = 0;
+		
 		
 		public function numberCombo()
 		{
@@ -42,6 +46,8 @@ package
 			bestScoresBoard = mainSwf.getChildByName("bestScoresBoard") as MovieClip;
 			options = mainSwf.getChildByName("options") as MovieClip;
 			cellBg = mainSwf.getChildByName("cellBg") as MovieClip;
+			gameOverBoard = mainSwf.getChildByName("gameOverBoard") as MovieClip;
+			gameOverBoard.visible = false;
 			positions = initPositions();
 			this.addChild(mainSwf);
 			
@@ -79,14 +85,19 @@ package
 		{
 			var i:int;
 			var j:int;
-			for(i = 0; i < MAX_HEIGHT -1; i++){
-				for(j = 0; j < MAX_WIDTH; j++){
-					if(currentCellsPos[i][j] < currentCellsPos[i+1][j]){
-						logSquare(currentCellsPos);
-						currentCellsPos[i][j] = 1;
-						currentCellsPos[i+1][j] = 0;
-						moveSingleCell(cellsArray[i+1][j], i, j);
-						logSquare(currentCellsPos);
+			var k:int;//最外层循环次数
+			for(k = 0; k < MAX_HEIGHT; k++){
+				for(i = 0; i < MAX_HEIGHT -1; i++){
+					for(j = 0; j < MAX_WIDTH; j++){
+						if(currentCellsPos[i][j] < currentCellsPos[i+1][j]){
+							currentCellsPos[i][j] = 1;
+							currentCellsPos[i+1][j] = 0;
+							moveSingleCell(cellsArray[i+1][j], i, j);
+							logSquare(currentCellsPos);
+						}else if(currentCellsPos[i][j] == 1 && currentCellsPos[i+1][j] == 1 && 
+							cellsArray[i][j]["cellNumber"].text == cellsArray[i+1][j]["cellNumber"].text){
+							combineTwoCells(i,j,i+1,j);
+						}
 					}
 				}
 			}
@@ -96,14 +107,19 @@ package
 		{
 			var i:int;
 			var j:int;
-			for(i = MAX_HEIGHT-1; i > 0; i--){
-				for(j = 0; j < MAX_WIDTH; j++){
-					if(currentCellsPos[i][j] < currentCellsPos[i-1][j]){
-						logSquare(currentCellsPos);
-						currentCellsPos[i][j] = 1;
-						currentCellsPos[i-1][j] = 0;
-						moveSingleCell(cellsArray[i-1][j], i, j);
-						logSquare(currentCellsPos);
+			var k:int;//最外层循环次数
+			for(k = 0; k < MAX_HEIGHT; k++){
+				for(i = MAX_HEIGHT-1; i > 0; i--){
+					for(j = 0; j < MAX_WIDTH; j++){
+						if(currentCellsPos[i][j] < currentCellsPos[i-1][j]){
+							currentCellsPos[i][j] = 1;
+							currentCellsPos[i-1][j] = 0;
+							moveSingleCell(cellsArray[i-1][j], i, j);
+							logSquare(currentCellsPos);
+						}else if(currentCellsPos[i][j] == 1 && currentCellsPos[i-1][j] == 1 && 
+							cellsArray[i][j]["cellNumber"].text == cellsArray[i-1][j]["cellNumber"].text){
+							combineTwoCells(i,j,i-1,j);
+						}
 					}
 				}
 			}
@@ -113,14 +129,19 @@ package
 		{
 			var i:int;
 			var j:int;
-			for(i = 0; i < MAX_HEIGHT; i++){
-				for(j = 0; j < MAX_WIDTH - 1; j++){
-					if(currentCellsPos[i][j] < currentCellsPos[i][j+1]){
-						logSquare(currentCellsPos);
-						currentCellsPos[i][j] = 1;
-						currentCellsPos[i][j+1] = 0;
-						moveSingleCell(cellsArray[i][j+1], i, j);
-						logSquare(currentCellsPos);
+			var k:int;//最外层循环次数
+			for(k = 0; k < MAX_WIDTH; k++){
+				for(i = 0; i < MAX_HEIGHT; i++){
+					for(j = 0; j < MAX_WIDTH - 1; j++){
+						if(currentCellsPos[i][j] < currentCellsPos[i][j+1]){
+							currentCellsPos[i][j] = 1;
+							currentCellsPos[i][j+1] = 0;
+							moveSingleCell(cellsArray[i][j+1], i, j);
+							logSquare(currentCellsPos);
+						}else if(currentCellsPos[i][j] == 1 && currentCellsPos[i][j+1] == 1 && 
+							cellsArray[i][j]["cellNumber"].text == cellsArray[i][j+1]["cellNumber"].text){
+							combineTwoCells(i,j,i,j+1);
+						}
 					}
 				}
 			}
@@ -130,14 +151,19 @@ package
 		{
 			var i:int;
 			var j:int;
-			for(i = 0; i < MAX_HEIGHT; i++){
-				for(j = MAX_WIDTH; j > 0; j--){
-					if(currentCellsPos[i][j] < currentCellsPos[i][j-1]){
-						logSquare(currentCellsPos);
-						currentCellsPos[i][j] = 1;
-						currentCellsPos[i][j-1] = 0;
-						moveSingleCell(cellsArray[i][j-1], i, j);
-						logSquare(currentCellsPos);
+			var k:int;//最外层循环次数
+			for(k = 0; k < MAX_WIDTH; k++){
+				for(i = 0; i < MAX_HEIGHT; i++){
+					for(j = MAX_WIDTH; j > 0; j--){
+						if(currentCellsPos[i][j] < currentCellsPos[i][j-1]){
+							currentCellsPos[i][j] = 1;
+							currentCellsPos[i][j-1] = 0;
+							moveSingleCell(cellsArray[i][j-1], i, j);
+							logSquare(currentCellsPos);
+						}else if(currentCellsPos[i][j] == 1 && currentCellsPos[i][j-1] == 1 && 
+							cellsArray[i][j]["cellNumber"].text == cellsArray[i][j-1]["cellNumber"].text){
+							combineTwoCells(i,j,i,j-1);
+						}
 					}
 				}
 			}
@@ -155,7 +181,13 @@ package
 		
 		private function combineTwoCells(first_cell_i:int,first_cell_j:int, second_cell_i:int, second_cell_j:int):void
 		{
+			addScore(int(cellsArray[first_cell_i][first_cell_j]["cellNumber"].text));
 			cellsArray[first_cell_i][first_cell_j]["cellNumber"].text = int(cellsArray[second_cell_i][second_cell_j]["cellNumber"].text)*2;
+			if(cellsArray[second_cell_i][second_cell_j].parent){
+				cellsArray[second_cell_i][second_cell_j].parent.removeChild(cellsArray[second_cell_i][second_cell_j]);
+				cellsArray[second_cell_i][second_cell_j] = new MovieClip;
+			}
+			currentCellsPos[second_cell_i][second_cell_j] = 0;
 			
 		}
 		
@@ -167,6 +199,29 @@ package
 			return classInstance;
 		}
 		*/
+		
+		
+		private function randomOneCell(numbers:int=2):void
+		{
+			var cell:MovieClip = new MovieClip;
+			cell = getCell(numbers);
+			var posX:int = Math.random()*MAX_WIDTH;
+			var posY:int = Math.random()*MAX_HEIGHT;
+			if(isGameOver(currentCellsPos)){
+				gameOver();
+				return;
+			}
+			if(currentCellsPos && currentCellsPos[posX][posY] == 0){
+				cell.x = positions[posX][posY][0];
+				cell.y = positions[posX][posY][1];
+				currentCellsPos[posX][posY] = 1;
+				cellsArray[posX][posY] = cell;
+				cellBg.addChild(cell);
+			}else{
+				randomOneCell(numbers);
+			}
+			logSquare(currentCellsPos);
+		}
 		
 		private function getCell(numbers:int):MovieClip{
 			var classRef:Class =  loader.contentLoaderInfo.applicationDomain.getDefinition("cell") as Class;
@@ -199,25 +254,15 @@ package
 			return pos;
 		}
 		
-		private function randomOneCell(numbers:int=2):void
+		private function addScore(score:int):void
 		{
-			var cell:MovieClip = new MovieClip;
-			cell = getCell(numbers);
-			var posX:int = Math.random()*MAX_WIDTH;
-			var posY:int = Math.random()*MAX_HEIGHT;
-			if(isGameOver(currentCellsPos)){
-				trace("Game Over!");
-				return;
-			}
-			if(currentCellsPos && currentCellsPos[posX][posY] == 0){
-				cell.x = positions[posX][posY][0];
-				cell.y = positions[posX][posY][1];
-				currentCellsPos[posX][posY] = 1;
-				cellsArray[posX][posY] = cell;
-				cellBg.addChild(cell);
-			}else{
-				randomOneCell(numbers);
-			}
+			currentScores += score;
+			currentScoresBoard["currentScores"].text = currentScores;
+		}
+		
+		private function setBestScores(scores:int):void
+		{
+			bestScoresBoard["bestScores"].text = scores;
 		}
 		
 		private function isGameOver(array:Array):Boolean
@@ -234,9 +279,28 @@ package
 			return true;
 		}
 		
+		private function gameOver():void
+		{
+			trace("game end")
+			if(currentScores > bestScores){
+				bestScores = currentScores;
+				setBestScores(bestScores);
+			}
+			removeEventListeners();
+			gameOverBoard.visible = true;
+			gameOverBoard["tryAgain"].mouseEnabled = true;
+			gameOverBoard["tryAgain"].buttonMode = true;
+			gameOverBoard["tryAgain"].mouseChildren = false;
+		}
+		
 		private function onOptionsClicked(event:MouseEvent):void
 		{
 			//randomOneCell(cellsArray[0]);
+		}
+		
+		private function removeEventListeners():void
+		{
+			stage.removeEventListener(KeyboardEvent.KEY_DOWN,onKeyboardEvent); 
 		}
 		
 		private function onRemove():void
