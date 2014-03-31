@@ -6,14 +6,15 @@ package
 	import flash.events.Event;
 	import flash.events.KeyboardEvent;
 	import flash.events.MouseEvent;
+	import flash.system.ApplicationDomain;
+	import flash.system.LoaderContext;
 	import flash.ui.Keyboard;
 	
 	[SWF(frameRate="24", width="480", height="800", backgroundColor="0xFFFFFF")]
 	
 	public class numberCombo extends Sprite
 	{
-		[Embed(source="../resources/2048_cs6.swf")]
-//, mimeType="application/octet-stream")]
+		[Embed(source="../resources/2048_cs6.swf", mimeType="application/octet-stream")]
 		private static var RESOURCE:Class;
 		
 		private static const DISTANCE_BETWEEN_CELLS:int = 110;
@@ -38,10 +39,11 @@ package
 		public function numberCombo()
 		{
 		    loader = new Loader();
-//			var urlRequest:URLRequest = new URLRequest("2048_cs6.swf");
 			loader.contentLoaderInfo.addEventListener(Event.COMPLETE, onloadCompleted);
-//			loader.load(urlRequest);
-			loader.loadBytes(new RESOURCE);
+			var _loaderContext:LoaderContext=new LoaderContext();
+			_loaderContext.applicationDomain = ApplicationDomain.currentDomain;
+			_loaderContext.allowCodeImport = true;
+			loader.loadBytes(new RESOURCE, _loaderContext);
 		}
 		
 		private function onloadCompleted(event:Event):void
