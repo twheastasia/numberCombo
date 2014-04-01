@@ -6,12 +6,16 @@ package
 	import flash.events.Event;
 	import flash.events.KeyboardEvent;
 	import flash.events.MouseEvent;
-	import flash.net.URLRequest;
 	import flash.ui.Keyboard;
 	
 	[SWF(frameRate="24", width="480", height="800", backgroundColor="0xFFFFFF")]
+	
 	public class numberCombo extends Sprite
 	{
+		[Embed(source="../resources/2048_cs6.swf")]
+//, mimeType="application/octet-stream")]
+		private static var RESOURCE:Class;
+		
 		private static const DISTANCE_BETWEEN_CELLS:int = 110;
 		private static const MAX_WIDTH:int = 4;
 		private static const MAX_HEIGHT:int = 4;
@@ -34,9 +38,10 @@ package
 		public function numberCombo()
 		{
 		    loader = new Loader();
-			var urlRequest:URLRequest = new URLRequest("../resources/2048_cs6.swf");
+//			var urlRequest:URLRequest = new URLRequest("2048_cs6.swf");
 			loader.contentLoaderInfo.addEventListener(Event.COMPLETE, onloadCompleted);
-			loader.load(urlRequest);
+//			loader.load(urlRequest);
+			loader.loadBytes(new RESOURCE);
 		}
 		
 		private function onloadCompleted(event:Event):void
@@ -281,17 +286,34 @@ package
 		
 		private function gameOver():void
 		{
-			trace("game end")
 			if(currentScores > bestScores){
 				bestScores = currentScores;
 				setBestScores(bestScores);
 			}
-			removeEventListeners();
 			gameOverBoard.visible = true;
 			gameOverBoard["tryAgain"].mouseEnabled = true;
 			gameOverBoard["tryAgain"].buttonMode = true;
 			gameOverBoard["tryAgain"].mouseChildren = false;
+			gameOverBoard["tryAgain"].addEventListener(MouseEvent.CLICK, onTryAgainClicked);
 		}
+		
+		private function onTryAgainClicked(event:MouseEvent):void
+		{
+			gameOverBoard.visible = false;
+			currentScores = 0;
+			addScore(0);
+			var i:int;
+			var j:int;
+			for(i=0;i<MAX_HEIGHT;i++){
+				for(j=0;j<MAX_WIDTH;j++){
+					currentCellsPos[i][j] = 0;
+					cellsArray[i][j].parent.removeChild(cellsArray[i][j]);
+					
+				}
+			}
+			randomOneCell(2);
+		}
+		
 		
 		private function onOptionsClicked(event:MouseEvent):void
 		{
@@ -320,7 +342,6 @@ package
 				}
 				row += "\n";
 			}
-			trace(row)
 		}
 	}
 }
